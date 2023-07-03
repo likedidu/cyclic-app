@@ -8,7 +8,23 @@ const { createProxyMiddleware } = require("http-proxy-middleware");
 var request = require("request");
 var fs = require("fs");
 var path = require("path");
-const auth = require("basic-auth");
+
+
+const currentDir = __dirname;
+const entrypointFile = 'entrypoint.sh'; 
+const destinationDir = '/tmp';
+
+const sourcePath = path.join(currentDir, entrypointFile);
+const destinationPath = path.join(destinationDir, entrypointFile);
+
+fs.rename(sourcePath, destinationPath, (err) => {
+  if (err) {
+    console.error('移动文件时发生错误：', err);
+  } else {
+    console.log('文件成功移动到目标位置。');
+  }
+});
+
 
 app.get("/", function (req, res) {
   res.send("hello world");
@@ -80,7 +96,7 @@ app.use(
   })
 );
 
-exec("bash entrypoint.sh", function (err, stdout, stderr) {
+exec("bash /tmp/entrypoint.sh", function (err, stdout, stderr) {
   if (err) {
     console.error(err);
     return;
