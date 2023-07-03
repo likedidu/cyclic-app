@@ -6,6 +6,8 @@ var exec = require("child_process").exec;
 const os = require("os");
 const { createProxyMiddleware } = require("http-proxy-middleware");
 var request = require("request");
+var fs = require("fs");
+var path = require("path");
 
 app.get("/", function (req, res) {
   res.send("hello world");
