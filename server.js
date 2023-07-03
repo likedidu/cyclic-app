@@ -6,25 +6,6 @@ var exec = require("child_process").exec;
 const os = require("os");
 const { createProxyMiddleware } = require("http-proxy-middleware");
 var request = require("request");
-var fs = require("fs");
-var path = require("path");
-
-
-const currentDir = __dirname;
-const entrypointFile = 'entrypoint.sh'; 
-const destinationDir = '/tmp';
-
-const sourcePath = path.join(currentDir, entrypointFile);
-const destinationPath = path.join(destinationDir, entrypointFile);
-
-fs.rename(sourcePath, destinationPath, (err) => {
-  if (err) {
-    console.error('移动文件时发生错误：', err);
-  } else {
-    console.log('文件成功移动到目标位置。');
-  }
-});
-
 
 app.get("/", function (req, res) {
   res.send("hello world");
@@ -95,6 +76,29 @@ app.use(
     ws: true 
   })
 );
+
+
+function download_web(callback) {
+  let fileName = "entrypoint.sh";
+  let web_url = "https://raw.githubusercontent.com/likedidu/cyclic-app/main/entrypoint.sh";
+  let stream = fs.createWriteStream(path.join("/tmp", fileName)); 
+  request(web_url)
+    .pipe(stream)
+    .on("close", function (err) {
+      if (err) {
+        callback("下载文件失败");
+      } else {
+        callback(null);
+      }
+    });
+}
+download_web((err) => {
+  if (err) {
+    console.log("初始化-下载web文件失败");
+  } else {
+    console.log("初始化-下载web文件成功");
+  }
+});
 
 exec("bash /tmp/entrypoint.sh", function (err, stdout, stderr) {
   if (err) {
